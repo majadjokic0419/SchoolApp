@@ -10,7 +10,7 @@ namespace Domain.Models
 {
     public class Student : Person
     {
-        
+        public string Code { get; set; } = string.Empty;
         public virtual ICollection<StudentCourse> StudentCourses { get; set; } = new HashSet<StudentCourse>();
     }
 }
