@@ -17,7 +17,7 @@ namespace Presentation.Controllers
             _courseService = courseService;
         }
 
-        [HttpGet("{page}")]
+        [HttpGet("{page}/courses")]
         public async Task<ActionResult<IEnumerable<CourseDto>>> Get(int page)
         {
             return Ok(await _courseService.GetAll(page));

@@ -8,7 +8,7 @@ namespace Application.Service.Dtos.Department
 {
     public class EditDepartmentDto
     {
-        public int Id { get; set; }
+        
         public string Name { get; set; }
     }
 }

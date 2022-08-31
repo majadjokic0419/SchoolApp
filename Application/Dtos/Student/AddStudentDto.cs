@@ -9,8 +9,9 @@ namespace Application.Service.Dtos.Student
 {
     public class AddStudentDto
     {
+        public string Code { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
-        public Address Address { get; set; }
+        public AddressDto Address { get; set; }
     }
 }

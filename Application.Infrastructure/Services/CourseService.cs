@@ -3,6 +3,7 @@ using Application.Service.Dtos;
 using Application.Service.Dtos.Course;
 using Application.Service.Dtos.Student;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain.Data;
 using Domain.Models;
 using Domain.Service.Repositories;
@@ -44,9 +45,9 @@ namespace Application.Infrastructure.Services
         {
             int pageCount = (_context.Courses.Count() + pageResults - 1) / pageResults;
 
-            var courses = await _context.Courses
+            var courses = await _context.Courses.ProjectTo<CourseDto>(_mapper.ConfigurationProvider)
                 .Skip((page - 1) * pageResults)
-                .Take(pageResults).Select(s => _mapper.Map<CourseDto>(s))
+                .Take(pageResults)
                 .ToListAsync();
 
             return new ResponsePage<CourseDto> { Result = courses, CurrentPage = page, Pages = (int)pageCount };          
@@ -55,8 +56,9 @@ namespace Application.Infrastructure.Services
         public async Task<CourseDto> GetById(int id)
         {
             var course = await _context.Courses
-               .Select(s => _mapper.Map<CourseDto>(s))
-               .FirstOrDefaultAsync(x => x.Id == id);
+                .Where(x => x.Id == id)
+                .ProjectTo<CourseDto>(_mapper.ConfigurationProvider)
+                .FirstOrDefaultAsync();
 
             if (course is null) throw new NullReferenceException("Course is null");
 

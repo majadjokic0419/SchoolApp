@@ -1,6 +1,7 @@
 ﻿using Application.Service;
 using Application.Service.Dtos.Department;
 using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using Domain.Data;
 using Domain.Models;
 using Domain.Service.Repositories;
@@ -40,9 +41,9 @@ namespace Application.Infrastructure.Services
         {
             int pageCount = (_context.Departments.Count() + pageResults - 1) / pageResults;
 
-            var departments = await _context.Departments
+            var departments = await _context.Departments.ProjectTo<DepartmentDto>(_mapper.ConfigurationProvider)
                 .Skip((page - 1) * pageResults)
-                .Take(pageResults).Select(s => _mapper.Map<DepartmentDto>(s))
+                .Take(pageResults)
                 .ToListAsync();
 
             return departments;
@@ -50,8 +51,7 @@ namespace Application.Infrastructure.Services
 
         public async Task<DepartmentDto> GetById(int id)
         {
-            var department = await _context.Departments
-               .Select(s => _mapper.Map<DepartmentDto>(s))
+            var department = await _context.Departments.ProjectTo<DepartmentDto>(_mapper.ConfigurationProvider)   
                .FirstOrDefaultAsync(x => x.Id == id);
 
             if (department is null) throw new NullReferenceException("Department is null");
@@ -64,7 +64,7 @@ namespace Application.Infrastructure.Services
         {
             var department = await _context.Departments
                .Where(x => x.Name == name)
-               .Select(s => _mapper.Map<DepartmentDto>(s)).FirstOrDefaultAsync();
+               .ProjectTo<DepartmentDto>(_mapper.ConfigurationProvider).FirstOrDefaultAsync();
 
             if (department is null) throw new NullReferenceException("Department is null");
 

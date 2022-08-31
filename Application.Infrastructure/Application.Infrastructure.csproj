@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="11.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="11.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Application\Application.Service.csproj" />
     <ProjectReference Include="..\Domain.Infrastructure\Domain.Infrastructure.csproj" />
     <ProjectReference Include="..\Domain.Service\Domain.Service.csproj" />

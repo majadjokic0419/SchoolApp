@@ -17,7 +17,7 @@ namespace Presentation.Controllers
             _professorService = professorService;
         }
 
-        [HttpGet("{page}")]
+        [HttpGet("{page}/professors")]
         public async Task<ActionResult<IEnumerable<ProfessorDto>>> Get(int page)
         {
             return Ok(await _professorService.GetAll(page));

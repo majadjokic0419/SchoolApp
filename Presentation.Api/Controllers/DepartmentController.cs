@@ -18,7 +18,7 @@ namespace Presentation.Controllers
             _depertmentService = depertmentService;
         }
 
-        [HttpGet]
+        [HttpGet("{page}/departments)")]
         public async Task<ActionResult<IEnumerable<DepartmentDto>>> Get(int page)
         {
             return Ok(await _depertmentService.GetAll(page));
