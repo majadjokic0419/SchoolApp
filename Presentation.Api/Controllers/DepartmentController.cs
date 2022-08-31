@@ -1,8 +1,9 @@
 ﻿
+using Application.Infrastructure.Services;
 using Application.Service;
 using Application.Service.Dtos.Department;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 //using Serilog;
 
 namespace Presentation.Controllers
@@ -11,62 +12,75 @@ namespace Presentation.Controllers
     [ApiController]
     public class DepartmentController : ControllerBase
     {
-        private readonly IDepartmentService _depertmentService;
+        private readonly IDepartmentService _departmentService;
 
-        public DepartmentController(IDepartmentService depertmentService)
+        public DepartmentController(IDepartmentService departmentService)
         {
-            _depertmentService = depertmentService;
+            _departmentService = departmentService;
         }
 
         [HttpGet("{page}/departments)")]
         public async Task<ActionResult<IEnumerable<DepartmentDto>>> Get(int page)
         {
-            return Ok(await _depertmentService.GetAll(page));
+            return Ok(await _departmentService.GetAll(page));
         }
 
-        //[HttpGet("{id}")]
-        //public async Task<ActionResult<DepartmentDto>> ById(int id)
-        //{
-        //    //try
-        //    //{
-        //    //    Log.Information("Get department by id");
-
-        //    //    return Ok(await depertmentService.GetById(id));
-        //    //}
-        //    //catch (Exception ex)
-        //    //{
-        //    //    Log.Fatal("Argument is not valid", ex.Message);
-
-        //    //    throw new Exception("Server Error");
-        //    //}
-        //}
+        [HttpGet("{id}")]
+        public async Task<ActionResult<DepartmentDto>> DepartmentById(int id)
+        {
+            return Ok(await _departmentService.GetById(id));
+        }
 
         [HttpGet("DepartmentName/{name}")]
         public async Task<ActionResult<DepartmentDto>> DepartmentName(string name)
         {
-            return Ok(await _depertmentService.GetByName(name));
+            return Ok(await _departmentService.GetByName(name));
         }
 
 
         [HttpPost]
         public async Task<ActionResult> AddDepartment([FromBody] AddDepartmentDto data)
         {
-            await _depertmentService.AddDepartment(data);
-            return Ok();
+            try
+            {
+                await _departmentService.AddDepartment(data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Sent object {@data}", data, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> EditDepartment(int id, [FromBody] EditDepartmentDto data)
         {
-            await _depertmentService.UpdateDepartment(id, data);
-            return Ok();
+            try
+            {
+                await _departmentService.UpdateDepartment(id, data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Sent object {@data}, Object with id:{@id} not found!", data, id, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
-            await _depertmentService.DeleteDepartment(id);
-            return Ok();
+            try
+            {
+                await _departmentService.DeleteDepartment(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Object with Id: {@id} not found!", id, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
     }

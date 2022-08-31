@@ -1,8 +1,7 @@
-﻿
-using Application.Service;
+﻿using Application.Service;
 using Application.Service.Dtos.Course;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
 
 namespace Presentation.Controllers
 {
@@ -32,36 +31,76 @@ namespace Presentation.Controllers
         [HttpPost]
         public async Task<ActionResult> AddCourse([FromBody] AddCourseDto data)
         {
-            await _courseService.AddCourse(data);
-            return Ok();
+            try
+            {
+                await _courseService.AddCourse(data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Sent object {@data}", data, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult> EditCourse(int id, [FromBody] EditCourseDto data)
         {
-            await _courseService.UpdateCourse(id,data);
-            return Ok();
+            try
+            {
+                await _courseService.UpdateCourse(id, data);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Sent object {@data}, Object with id:{@id} not found!", data, id, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpDelete]
         public async Task<ActionResult> Delete(int id)
         {
-            await _courseService.DeleteCourse(id);
-            return Ok();
+            try
+            {
+                await _courseService.DeleteCourse(id);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Object with Id: {@id} not found!", id, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpPost("studentToCourse")]
         public async Task<ActionResult> AddStudent([FromBody] AddStudentToCourseDto data)
         {
-            await _courseService.AddStudentToCourse(data.studentId, data.courseId);
-            return Ok();
+            try
+            {
+                await _courseService.AddStudentToCourse(data.studentId, data.courseId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Object sent: {@data}", data, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
         [HttpPost("professorToCourse")]
         public async Task<ActionResult> AddProfessor([FromBody] AddProfessorToCourseDto data)
         {
-            await _courseService.AddStudentToCourse(data.professorId, data.courseId);
-            return Ok();
+            try
+            {
+                await _courseService.AddStudentToCourse(data.professorId, data.courseId);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal("Object sent: {@data}", data, ex.Message);
+                throw new Exception("Server error");
+            }
         }
 
     }
