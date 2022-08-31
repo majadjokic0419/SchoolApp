@@ -1,4 +1,5 @@
 ﻿using Application.Service;
+using Application.Service.Dtos;
 using Application.Service.Dtos.Department;
 using Application.Service.Dtos.Professor;
 using Application.Service.Dtos.Student;
@@ -44,7 +45,7 @@ namespace Application.Infrastructure.Services
             await _unitOfWork.Save();
         }
 
-        public async Task<List<ProfessorDto>> GetAll(int page, int pageResults = 3)
+        public async Task<ResponsePage<ProfessorDto>> GetAll(int page, int pageResults = 3)
         {
             int pageCount = (_context.Professors.Count() + pageResults - 1) / pageResults;
 
@@ -53,7 +54,7 @@ namespace Application.Infrastructure.Services
                 .Take(pageResults).Select(s => _mapper.Map<ProfessorDto>(s))
                 .ToListAsync();
 
-            return professors;
+            return new ResponsePage<ProfessorDto> { Result = professors, CurrentPage = page, Pages = (int)pageCount };
         }
 
         public async Task<ProfessorDto> GetById(int id)
@@ -68,9 +69,9 @@ namespace Application.Infrastructure.Services
 
         }
 
-        public async Task UpdateProfessor(EditProfessorDto dto)
+        public async Task UpdateProfessor(int id, EditProfessorDto dto)
         {
-            var professorTemp = await _context.Professors.FindAsync(dto.Id);
+            var professorTemp = await _context.Professors.FindAsync(id);
             if (professorTemp is null) throw new NullReferenceException("Professor is null");
 
             Professor professor = _mapper.Map<Professor>(dto);

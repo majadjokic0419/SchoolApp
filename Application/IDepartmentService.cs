@@ -9,10 +9,11 @@ namespace Application.Service
 {
     public interface IDepartmentService
     {
-        Task<List<DepartmentDto>> GetAll(int page, int pageResults);
+        Task<List<DepartmentDto>> GetAll(int page, int pageResults = 3);
         Task<DepartmentDto> GetById(int id);
+        Task<DepartmentDto> GetByName(string name);
         Task AddDepartment(AddDepartmentDto dto);
-        Task UpdateDepartment(EditDepartmentDto dto);
+        Task UpdateDepartment(int id,EditDepartmentDto dto);
         Task DeleteDepartment(int id);
     }
 }

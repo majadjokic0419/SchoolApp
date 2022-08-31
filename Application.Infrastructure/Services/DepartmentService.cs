@@ -60,9 +60,20 @@ namespace Application.Infrastructure.Services
 
         }
 
-        public async Task UpdateDepartment(EditDepartmentDto dto)
+        public async Task<DepartmentDto> GetByName(string name)
         {
-            var departmentTemp = await _context.Departments.FindAsync(dto.Id);
+            var department = await _context.Departments
+               .Where(x => x.Name == name)
+               .Select(s => _mapper.Map<DepartmentDto>(s)).FirstOrDefaultAsync();
+
+            if (department is null) throw new NullReferenceException("Department is null");
+
+            return department;
+        }
+
+        public async Task UpdateDepartment(int id, EditDepartmentDto dto)
+        {
+            var departmentTemp = await _context.Departments.FindAsync(id);
             if (departmentTemp is null) throw new NullReferenceException("Department is null");
 
             Department department = _mapper.Map<Department>(dto);

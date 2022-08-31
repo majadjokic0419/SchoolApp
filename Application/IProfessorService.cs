@@ -1,19 +1,14 @@
-﻿using Application.Service.Dtos.Professor;
-using Application.Service.Dtos.Student;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Application.Service.Dtos;
+using Application.Service.Dtos.Professor;
 
 namespace Application.Service
 {
-   public interface IProfessorService
+    public interface IProfessorService
     {
-        Task<List<ProfessorDto>> GetAll(int page, int pageResults);
+        Task<ResponsePage<ProfessorDto>> GetAll(int page, int pageResults = 3);
         Task<ProfessorDto> GetById(int id);
         Task AddProfessor(AddProfessorDto dto);
-        Task UpdateProfessor(EditProfessorDto dto);
+        Task UpdateProfessor(int id, EditProfessorDto dto);
         Task DeleteProfessor(int id);
     }
 }

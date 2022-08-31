@@ -1,4 +1,5 @@
 ﻿using Application.Service;
+using Application.Service.Dtos;
 using Application.Service.Dtos.Course;
 using Application.Service.Dtos.Student;
 using AutoMapper;
@@ -39,7 +40,7 @@ namespace Application.Infrastructure.Services
             await _unitOfWork.Save();
         }
 
-        public async Task<List<CourseDto>> GetAll(int page, int pageResults = 3)
+        public async Task<ResponsePage<CourseDto>> GetAll(int page, int pageResults = 3)
         {
             int pageCount = (_context.Courses.Count() + pageResults - 1) / pageResults;
 
@@ -47,7 +48,8 @@ namespace Application.Infrastructure.Services
                 .Skip((page - 1) * pageResults)
                 .Take(pageResults).Select(s => _mapper.Map<CourseDto>(s))
                 .ToListAsync();
-            return courses;
+
+            return new ResponsePage<CourseDto> { Result = courses, CurrentPage = page, Pages = (int)pageCount };          
         }
 
         public async Task<CourseDto> GetById(int id)
@@ -62,15 +64,25 @@ namespace Application.Infrastructure.Services
 
         }
 
-        public async Task UpdateCourse(EditCourseDto dto)
+        public async Task UpdateCourse(int id, EditCourseDto dto)
         {
-            var courseTemp = await _context.Courses.FindAsync(dto.Id);
+            var courseTemp = await _context.Courses.FindAsync(id);
             if (courseTemp is null) throw new NullReferenceException("Course is null");
 
             Course course = _mapper.Map<Course>(dto);
 
             await _unitOfWork.CourseRepository.Update(course);
             await _unitOfWork.Save();
+        }
+
+        public async Task AddStudentToCourse(int studentId, int courseId)
+        {
+            await _unitOfWork.CourseRepository.AddStudentToCourse(studentId, courseId);
+        }
+
+        public async Task AddProfessorToCourse(int professorId, int courseId)
+        {
+            await _unitOfWork.CourseRepository.AddProfessorToCourse(professorId, courseId);
         }
     }
 }

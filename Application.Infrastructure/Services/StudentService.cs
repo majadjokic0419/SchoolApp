@@ -1,9 +1,8 @@
 ﻿using Application.Service;
+using Application.Service.Dtos;
 using Application.Service.Dtos.Student;
-using Application.Service.Mapping;
 using AutoMapper;
 using Domain.Data;
-using Domain.Infrastructure;
 using Domain.Models;
 using Domain.Service.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -26,9 +25,8 @@ namespace Application.Infrastructure.Services
 
         public async Task AddStudent(AddStudentDto dto)
         {
-            Student student = new Student();
 
-            student = _mapper.Map<Student>(dto);
+            Student student = _mapper.Map<Student>(dto);
 
             await _unitOfWork.StudentRepository.Insert(student);
             await _unitOfWork.Save();
@@ -40,16 +38,28 @@ namespace Application.Infrastructure.Services
             await _unitOfWork.Save();
         }
 
-        public async Task<List<StudentDto>> GetAll(int page, int pageResults = 3)
+        public async Task<ResponsePage<StudentDto>> GetAll(int page, int pageResults = 3, string? firstName = null, string? lastName = null)
         {
+            var query = _context.Students.AsQueryable();
+
+            if (String.IsNullOrWhiteSpace(firstName) == false)
+            {
+                query = query.Where(x => x.FirstName == firstName);
+            }
+
+            if (String.IsNullOrWhiteSpace(lastName) == false)
+            {
+                query = query.Where(x => x.LastName == lastName);
+            }
 
             int pageCount = (_context.Students.Count() + pageResults - 1) / pageResults;
 
-            var students = await _context.Students
+            var students = await query
                 .Skip((page - 1) * pageResults)
                 .Take(pageResults).Select(s => _mapper.Map<StudentDto>(s))
                 .ToListAsync();
-            return students;
+
+            return new ResponsePage<StudentDto> { Result = students, CurrentPage = page, Pages = (int)pageCount };
         }
 
         public async Task<StudentDto> GetById(int id)
@@ -65,15 +75,15 @@ namespace Application.Infrastructure.Services
 
         }
 
-        public async Task UpdateStudent(EditStudentDto dto)
+        public async Task UpdateStudent(int id, EditStudentDto dto)
         {
-            var studentTemp= await _context.Students.FindAsync(dto.Id);
+            var studentTemp = await _context.Students.FindAsync(id);
             if (studentTemp is null) throw new NullReferenceException("Student is null");
 
             Student student = _mapper.Map<Student>(dto);
 
-           await _unitOfWork.StudentRepository.Update(student);
-           await _unitOfWork.Save();
+            await _unitOfWork.StudentRepository.Update(student);
+            await _unitOfWork.Save();
         }
     }
 }
